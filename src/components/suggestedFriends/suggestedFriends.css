@@ -1,0 +1,34 @@
+.container {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 200px;
+}
+.container h4 {
+  font-weight: 500;
+  font-size: 1.15rem;
+}
+
+.suggestion {
+  background-color: aquamarine;
+  font-weight: 500;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 1rem;
+  cursor: pointer;
+  height: 3rem;
+  align-items: center;
+  border-radius: 2rem;
+  padding-left: 1rem;
+  box-shadow: 2px 2px 5px 1px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.5s ease;
+}
+.suggestion:hover {
+  background-color: bisque;
+}
+.suggestionImg {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
