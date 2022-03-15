@@ -1,7 +1,9 @@
 import axios from "axios";
-import { useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import "./register.css";
 import { useNavigate } from "react-router";
+import { AuthContext } from "../../context/AuthContext";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function Register() {
   const username = useRef();
@@ -9,12 +11,15 @@ export default function Register() {
   const password = useRef();
   const passwordAgain = useRef();
   const navigate = useNavigate();
+  const { isFetching, dispatch } = useContext(AuthContext);
+  const [error, setError] = useState({ message: "", show: false });
 
   const handleClick = async (e) => {
     e.preventDefault();
     if (passwordAgain.current.value !== password.current.value) {
       passwordAgain.current.setCustomValidity("Passwords don't match!");
     } else {
+      dispatch({ type: "REGISTER_START" });
       const user = {
         username: username.current.value,
         email: email.current.value,
@@ -22,20 +27,41 @@ export default function Register() {
       };
       try {
         await axios.post("http://localhost:7000/api/auth/register", user);
-        navigate("/login");
+        const res = await axios.post("http://localhost:7000/api/auth/login", {
+          email: email.current.value,
+          password: password.current.value,
+        });
+        dispatch({ type: "REGISTER_SUCCESS", payload: res.data.data });
+        navigate("/");
       } catch (err) {
-        console.log(err);
+        dispatch({ type: "REGISTER_FAILURE" });
+        setError({
+          message: JSON.parse(err.request.response).message,
+          show: true,
+        });
       }
     }
   };
 
+  useEffect(() => {
+    if (error.show) {
+      const timeout = setTimeout(() => {
+        setError({ ...error, show: false });
+      }, 4500);
+      return () => clearTimeout(timeout);
+    }
+  }, [error.show]);
+
   return (
     <div className="login">
+      <div className={`errorMessage ${error.show ? "show" : ""}`}>
+        {error.message}
+      </div>
       <div className="loginWrapper">
         <div className="loginLeft">
-          <h3 className="loginLogo">Lamasocial</h3>
+          <h3 className="loginLogo">facebook</h3>
           <span className="loginDesc">
-            Connect with friends and the world around you on Lamasocial.
+            Connect with friends and the world around you on facebook.
           </span>
         </div>
         <div className="loginRight">
@@ -68,10 +94,20 @@ export default function Register() {
               className="loginInput"
               type="password"
             />
-            <button className="loginButton" type="submit">
-              Sign Up
+            <button className="signUp" type="submit" disabled={isFetching}>
+              {isFetching ? (
+                <CircularProgress sx={{ color: "white" }} />
+              ) : (
+                "Sign up"
+              )}
             </button>
-            <button className="loginRegisterButton">Log into Account</button>
+            <button
+              className="logIn"
+              onClick={() => navigate("/")}
+              disabled={isFetching}
+            >
+              Log into Account
+            </button>
           </form>
         </div>
       </div>

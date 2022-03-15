@@ -18,6 +18,10 @@
   flex: 5.5;
 }
 
+.current {
+  background-color: rgba(0, 0, 255, 0.1);
+  border-radius: 2rem;
+}
 .chatBoxWrapper {
   display: flex;
   flex-direction: column;
@@ -82,11 +86,11 @@
     display: none;
   }
 
-  .chatBox{
+  .chatBox {
     flex: 10;
   }
 
-  .chatOnline{
+  .chatOnline {
     flex: 1px;
   }
 }

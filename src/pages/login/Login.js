@@ -1,29 +1,57 @@
-import { useContext, useRef } from "react";
+import { useContext, useRef, useEffect, useState } from "react";
 import "./login.css";
-import { loginCall } from "../../apiCalls";
 import { AuthContext } from "../../context/AuthContext";
-import { CircularProgress } from "@material-ui/core";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Login() {
   const email = useRef();
   const password = useRef();
+  const navigate = useNavigate();
   const { isFetching, dispatch } = useContext(AuthContext);
+  const [error, setError] = useState({ message: "", show: false });
 
   const handleClick = (e) => {
     e.preventDefault();
-    loginCall(
-      { email: email.current.value, password: password.current.value },
-      dispatch
-    );
+    dispatch({ type: "LOGIN_START" });
+    const handleLogin = async () => {
+      try {
+        const res = await axios.post("http://localhost:7000/api/auth/login", {
+          email: email.current.value,
+          password: password.current.value,
+        });
+        dispatch({ type: "LOGIN_SUCCESS", payload: res.data.data });
+      } catch (err) {
+        dispatch({ type: "LOGIN_FAILURE" });
+        setError({
+          message: JSON.parse(err.request.response).message,
+          show: true,
+        });
+      }
+    };
+    handleLogin();
   };
+
+  useEffect(() => {
+    if (error.show) {
+      const timeout = setTimeout(() => {
+        setError({ ...error, show: false });
+      }, 4500);
+      return () => clearTimeout(timeout);
+    }
+  }, [error.show]);
 
   return (
     <div className="login">
+      <div className={`errorMessage ${error.show ? "show" : ""}`}>
+        {error.message}
+      </div>
       <div className="loginWrapper">
         <div className="loginLeft">
-          <h3 className="loginLogo">Lamasocial</h3>
+          <h3 className="loginLogo">facebook</h3>
           <span className="loginDesc">
-            Connect with friends and the world around you on Lamasocial.
+            Connect with friends and the world around you on facebook.
           </span>
         </div>
         <div className="loginRight">
@@ -45,15 +73,18 @@ export default function Login() {
             />
             <button className="loginButton" type="submit" disabled={isFetching}>
               {isFetching ? (
-                <CircularProgress color="white" size="20px" />
+                <CircularProgress size="20px" sx={{ color: "white" }} />
               ) : (
                 "Log In"
               )}
             </button>
             <span className="loginForgot">Forgot Password?</span>
-            <button className="loginRegisterButton">
+            <button
+              className="loginRegisterButton"
+              onClick={() => navigate("/register")}
+            >
               {isFetching ? (
-                <CircularProgress color="white" size="20px" />
+                <CircularProgress size="20px" sx={{ color: "white" }} />
               ) : (
                 "Create a New Account"
               )}

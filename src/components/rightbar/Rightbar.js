@@ -1,6 +1,5 @@
 import "./rightbar.css";
-import { Users } from "../../dummyData";
-import Online from "../online/Online";
+import Contact from "../contact/Contact";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -19,28 +18,28 @@ export default function Rightbar({ user }) {
   }, [user]);
 
   useEffect(() => {
-    const getFriends = async () => {
-      if (user) {
-        try {
-          const friendList = await axios.get(
-            "http://localhost:7000/api/users/friends/" + user._id,
-            {
-              headers: {
-                token: `Bearer ${
-                  JSON.parse(localStorage.getItem("user")).accessToken
-                }`,
-              },
-            }
-          );
-          setFriends(friendList.data.data);
-        } catch (err) {
-          console.log(JSON.parse(err.request.response).message);
-        }
+    const getFriends = async (user) => {
+      try {
+        const res = await axios.get(
+          "http://localhost:7000/api/users/friends/" + user._id,
+          {
+            headers: {
+              token: `Bearer ${
+                JSON.parse(localStorage.getItem("user")).accessToken
+              }`,
+            },
+          }
+        );
+        console.log(res.data.data);
+        setFriends(res.data.data);
+      } catch (err) {
+        console.log(err);
+        console.log(JSON.parse(err.request.response).message);
       }
     };
 
-    getFriends();
-  }, [user]);
+    getFriends(currentUser);
+  }, []);
 
   const handleClick = async () => {
     try {
@@ -78,7 +77,6 @@ export default function Rightbar({ user }) {
       setFollowed(!followed);
     } catch (err) {}
   };
-
   const HomeRightbar = () => {
     return (
       <>
@@ -89,10 +87,10 @@ export default function Rightbar({ user }) {
           </span>
         </div>
         <SuggestedFriends />
-        <h4 className="rightbarTitle">Online Friends</h4>
+        <h4 className="rightbarTitle">Contacts</h4>
         <ul className="rightbarFriendList">
-          {Users.map((u) => (
-            <Online key={u.id} user={u} />
+          {friends.map((u) => (
+            <Contact key={u._id} user={u} />
           ))}
         </ul>
       </>

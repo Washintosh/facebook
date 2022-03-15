@@ -1,4 +1,4 @@
-import "./sidebar.css";
+import "./sidebarDesktop.css";
 import {
   RssFeed,
   Chat,
@@ -20,7 +20,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const { isSidebarOpen } = useContext(AuthContext);
   return (
-    <div className={`sidebar ${isSidebarOpen ? "show" : ""}`}>
+    <div className={`sidebarDesktop ${isSidebarOpen ? "show" : ""}`}>
       <div className="sidebarWrapper">
         <ul className="sidebarList">
           <li className="sidebarListItem">

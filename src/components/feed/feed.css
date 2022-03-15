@@ -1,7 +1,11 @@
-.feed{
-    flex:5.5
+.feed {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
-.feedWrapper{
-    padding: 20px;
+.feedWrapper {
+  width: 40%;
+  min-width: 500px;
+  padding: 20px;
 }
