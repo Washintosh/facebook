@@ -7,12 +7,21 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { useParams } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
+import storage from "../../firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 export default function Profile() {
   const { user, dispatch } = useContext(AuthContext);
+  const { accessToken } = user;
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
-  const username = useParams().username;
-  const [file, setFile] = useState();
+  const { username } = useParams();
+  const [profilePic, setProfilePic] = useState(user.profilePicture);
+  const [profileUser, setProfileUser] = useState({});
+  const [alert, setAlert] = useState({
+    show: false,
+    message: "",
+    success: true,
+  });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -26,102 +35,170 @@ export default function Profile() {
           },
         }
       );
-      // setUser(res.data.data);
-      dispatch({
-        type: "LOGIN_SUCCESS",
-        payload: res.data.data,
-      });
+      setProfileUser(res.data.data);
+      // dispatch({
+      //   type: "LOGIN_SUCCESS",
+      //   payload: res.data.data,
+      // });
     };
     fetchUser();
   }, [username]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    const newUser = {};
-    if (file) {
-      const data = new FormData();
-      const fileName = Date.now() + file.name;
-      data.append("name", fileName);
-      data.append("file", file);
-      newUser.profilePicture = fileName;
-      console.log(newUser);
+    dispatch({ type: "UPDATE_START" });
+    const updateUser = async (body) => {
       try {
-        await axios.post("http://localhost:7000/api/upload", data);
-      } catch (err) {
-        console.log(JSON.parse(err.request.response).message);
-      }
-      dispatch({
-        type: "LOGIN_SUCCESS",
-        payload: { ...user, profilePicture: fileName },
-      });
-
-      try {
-        await axios.put(
+        const res = await axios.put(
           `http://localhost:7000/api/users/${user._id}`,
-          newUser,
+          body,
           {
             headers: {
-              token: `Bearer ${
-                JSON.parse(localStorage.getItem("user")).accessToken
-              }`,
+              token:
+                "Bearer " +
+                JSON.parse(localStorage.getItem("user")).accessToken,
             },
           }
         );
-      } catch (err) {
-        console.log("err", err);
-        console.log(JSON.parse(err.request.response).message);
+        const {
+          password: {},
+          ...updatedUser
+        } = res.data.data;
+        dispatch({
+          type: "UPDATE_SUCCESS",
+          payload: { ...updatedUser, accessToken },
+        });
+        setAlert({
+          show: true,
+          message: "The user was successfully updated",
+          success: true,
+        });
+      } catch (error) {
+        console.log("error", error);
+        setAlert({
+          show: true,
+          message: JSON.parse(error.request.response).message,
+          success: false,
+        });
+        dispatch({
+          type: "UPDATE_FAILURE",
+        });
       }
+    };
+    if (profilePic) {
+      const filename = new Date().getTime() + profilePic.name;
+      const uploadTask = uploadBytesResumable(
+        ref(storage, `/profile/${filename}`),
+        profilePic
+      );
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+        },
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            updateUser({ profilePicture: url });
+          });
+        }
+      );
     }
   };
+
+  useEffect(() => {
+    if (alert.show) {
+      const timeout = setTimeout(
+        () => setAlert((prev) => ({ ...prev, show: false })),
+        4500
+      );
+      return () => clearTimeout(timeout);
+    }
+  }, [alert.show]);
 
   return (
     <>
       <Topbar />
       <div className="profile">
+        <button
+          className="test"
+          onClick={() =>
+            setAlert({
+              show: true,
+              message: "The user was successfully updated",
+              success: true,
+            })
+          }
+        >
+          TEST
+        </button>
+        <div
+          className={`${
+            alert.show
+              ? alert.success
+                ? "alert show success"
+                : "alert show error"
+              : alert.success
+              ? "alert success"
+              : "alert error"
+          }`}
+        >
+          {alert.message}
+        </div>
         <Sidebar />
         <div className="profileRight">
           <div className="profileRightTop">
             <div className="profileCover">
               <img
                 className="profileCoverImg"
-                src={
-                  user.coverPicture
-                    ? PF + user.coverPicture
-                    : PF + "person/noCover.png"
-                }
+                src={profileUser.coverPicture}
                 alt=""
               />
               <img
                 className="profileUserImg"
                 src={
-                  user.profilePicture
-                    ? PF + user.profilePicture
-                    : PF + "person/noAvatar.png"
+                  user === profileUser
+                    ? profilePic === user.profilePicture
+                      ? profilePic
+                      : URL.createObjectURL(profilePic)
+                    : profileUser.profilePicture
                 }
                 alt=""
               />
             </div>
             <div className="profileInfo">
-              <h4 className="profileInfoName">{user.username}</h4>
-              <span className="profileInfoDesc">{user.desc}</span>
+              <h4 className="profileInfoName">{profileUser.username}</h4>
+              <span className="profileInfoDesc">{profileUser.desc}</span>
               <form onSubmit={submitHandler} className="changeImgForm">
-                <label htmlFor="file" className="changeImg">
-                  <span className="shareOptionText">Change profile image</span>
-                  <input
-                    style={{ display: "none" }}
-                    type="file"
-                    id="file"
-                    accept=".png,.jpeg,.jpg"
-                    onChange={(e) => setFile(e.target.files[0])}
-                  />
-                </label>
-                {file && <button>UPDATE</button>}
+                {profileUser._id === user._id && (
+                  <>
+                    <label htmlFor="file" className="changeImg">
+                      <span className="shareOptionText">
+                        Change profile image
+                      </span>
+                      <input
+                        style={{ display: "none" }}
+                        type="file"
+                        id="file"
+                        accept=".png,.jpeg,.jpg"
+                        onChange={(e) => setProfilePic(e.target.files[0])}
+                      />
+                    </label>
+                    {profilePic !== user.profilePicture && (
+                      <button>UPDATE</button>
+                    )}
+                  </>
+                )}
               </form>
             </div>
           </div>
           <div className="profileRightBottom">
             <Feed username={username} />
-            <Rightbar user={user} />
+            <Rightbar user={profileUser} />
           </div>
         </div>
       </div>

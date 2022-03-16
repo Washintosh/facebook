@@ -12,6 +12,7 @@ export default function Post({ post }) {
   const [user, setUser] = useState({});
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const { user: currentUser } = useContext(AuthContext);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsLiked(post.likes.includes(currentUser._id));
@@ -33,6 +34,21 @@ export default function Post({ post }) {
     };
     fetchUser();
   }, [post.userId]);
+
+  const handleDelete = async (e) => {
+    try {
+      await axios.delete(`http://localhost:7000/api/posts/${post._id}`, {
+        headers: {
+          token: `Bearer ${
+            JSON.parse(localStorage.getItem("user")).accessToken
+          }`,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      console.log(JSON.parse(error.request.response).message);
+    }
+  };
 
   const likeHandler = () => {
     try {
@@ -56,41 +72,47 @@ export default function Post({ post }) {
   return (
     <div className="post">
       <div className="postWrapper">
+        {currentUser._id === post.userId && (
+          <div className={`${isMenuOpen ? "show" : ""} menu`}>
+            <button className="menuBtn" onClick={handleDelete}>
+              Delete post
+            </button>
+          </div>
+        )}
         <div className="postTop">
           <div className="postTopLeft">
             <Link to={`/profile/${user.username}`}>
               <img
                 className="postProfileImg"
-                src={
-                  user.profilePicture
-                    ? PF + user.profilePicture
-                    : PF + "person/noAvatar.png"
-                }
+                src={user.profilePicture}
                 alt=""
               />
+              <span className="postUsername">{user.username}</span>
             </Link>
-            <span className="postUsername">{user.username}</span>
             <span className="postDate">{format(post.createdAt)}</span>
           </div>
-          <div className="postTopRight">
+          <div
+            className="postTopRight"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             <MoreVert />
           </div>
         </div>
         <div className="postCenter">
           <span className="postText">{post?.desc}</span>
-          <img className="postImg" src={PF + post.img} alt="" />
+          <img className="postImg" src={post.img} alt="" />
         </div>
         <div className="postBottom">
           <div className="postBottomLeft">
             <img
               className="likeIcon"
-              src={`${PF}like.png`}
+              src={`https://firebasestorage.googleapis.com/v0/b/facebook-dc21a.appspot.com/o/public%2Flike.png?alt=media&token=2bdaea58-f4e6-4476-b1f9-72ccda9ddc95`}
               onClick={likeHandler}
               alt=""
             />
             <img
               className="likeIcon"
-              src={`${PF}heart.png`}
+              src={`https://firebasestorage.googleapis.com/v0/b/facebook-dc21a.appspot.com/o/public%2Fheart.png?alt=media&token=2fe5af6b-ba62-463f-b8d4-3a9bc6642bf2`}
               onClick={likeHandler}
               alt=""
             />

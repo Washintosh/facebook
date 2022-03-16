@@ -38,9 +38,7 @@ const SuggestedFriends = () => {
         >
           <div className="suggestionImgContainer">
             <img
-              src={
-                "https://hope.be/wp-content/uploads/2015/05/no-user-image.gif"
-              }
+              src={suggestion.profilePicture}
               alt=""
               className="suggestionImg"
             />

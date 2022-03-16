@@ -9,6 +9,8 @@ import {
 import { useContext, useRef, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
+import storage from "../../firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 export default function Share() {
   const { user } = useContext(AuthContext);
@@ -23,30 +25,40 @@ export default function Share() {
       desc: desc.current.value,
     };
     if (file) {
-      const data = new FormData();
-      const fileName = Date.now() + file.name;
-      data.append("name", fileName);
-      data.append("file", file);
-      newPost.img = fileName;
-      console.log(newPost);
-      try {
-        await axios.post("http://localhost:7000/api/upload", data);
-      } catch (err) {
-        console.log(JSON.parse(err.request.response).message);
-      }
-    }
-    try {
-      await axios.post("http://localhost:7000/api/posts", newPost, {
-        headers: {
-          token: `Bearer ${
-            JSON.parse(localStorage.getItem("user")).accessToken
-          }`,
+      const filename = new Date().getTime() + file.name;
+      const uploadTask = uploadBytesResumable(
+        ref(storage, `/posts/${filename}`),
+        file
+      );
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
         },
-      });
-      window.location.reload();
-    } catch (err) {
-      console.log("err", err);
-      console.log(JSON.parse(err.request.response).message);
+        (error) => {
+          console.log(error);
+        },
+        async () => {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          newPost.img = url;
+          try {
+            await axios.post("http://localhost:7000/api/posts", newPost, {
+              headers: {
+                token: `Bearer ${
+                  JSON.parse(localStorage.getItem("user")).accessToken
+                }`,
+              },
+            });
+          } catch (err) {
+            console.log("err", err);
+            console.log(JSON.parse(err.request.response).message);
+          }
+          desc.current.value = "";
+          setFile(null);
+        }
+      );
     }
   };
 
@@ -54,15 +66,7 @@ export default function Share() {
     <div className="share">
       <div className="shareWrapper">
         <div className="shareTop">
-          <img
-            className="shareProfileImg"
-            src={
-              user.profilePicture
-                ? PF + user.profilePicture
-                : PF + "person/noAvatar.png"
-            }
-            alt=""
-          />
+          <img className="shareProfileImg" src={user.profilePicture} alt="" />
           <input
             placeholder={"What's in your mind " + user.username + "?"}
             className="shareInput"

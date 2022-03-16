@@ -53,15 +53,7 @@ export default function Topbar() {
           </div>
         </div>
         <Link to={`/profile/${user?.username}`}>
-          <img
-            src={
-              user.profilePicture
-                ? PF + user?.profilePicture
-                : PF + "person/noAvatar.png"
-            }
-            alt=""
-            className="topbarImg"
-          />
+          <img src={user.profilePicture} alt="" className="topbarImg" />
         </Link>
         <button onClick={() => dispatch({ type: "LOGOUT" })} className="logout">
           <IoLogOutOutline />
