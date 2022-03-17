@@ -9,3 +9,15 @@
   min-width: 500px;
   padding: 20px;
 }
+
+.skeleton {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.skeleton div {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

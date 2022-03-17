@@ -3,6 +3,7 @@
   overflow-x: hidden;
   width: 100%;
   position: absolute;
+  margin-top: 3rem;
 }
 
 .test {
@@ -28,7 +29,32 @@
   height: 250px;
   object-fit: cover;
 }
-
+.coverImgContainer {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 1rem;
+}
+.coverImgContainer button {
+  border: none;
+  padding: 0.5rem;
+  background-color: green;
+  color: white;
+  font-weight: 500;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+.changeCoverImg span {
+  background-color: #eee;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+.changeCoverImg span:hover {
+  background-color: #ddd;
+}
 .profileUserImg {
   width: 150px;
   height: 150px;

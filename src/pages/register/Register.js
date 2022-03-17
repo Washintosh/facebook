@@ -2,8 +2,8 @@ import axios from "axios";
 import { useContext, useEffect, useRef, useState } from "react";
 import "./register.css";
 import { useNavigate } from "react-router";
-import { AuthContext } from "../../context/AuthContext";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Register() {
   const username = useRef();
@@ -11,7 +11,8 @@ export default function Register() {
   const password = useRef();
   const passwordAgain = useRef();
   const navigate = useNavigate();
-  const { isFetching, dispatch } = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const { pending } = useSelector((state) => state.user);
   const [error, setError] = useState({ message: "", show: false });
 
   const handleClick = async (e) => {
@@ -94,8 +95,8 @@ export default function Register() {
               className="loginInput"
               type="password"
             />
-            <button className="signUp" type="submit" disabled={isFetching}>
-              {isFetching ? (
+            <button className="signUp" type="submit" disabled={pending}>
+              {pending ? (
                 <CircularProgress sx={{ color: "white" }} />
               ) : (
                 "Sign up"
@@ -104,7 +105,7 @@ export default function Register() {
             <button
               className="logIn"
               onClick={() => navigate("/")}
-              disabled={isFetching}
+              disabled={pending}
             >
               Log into Account
             </button>

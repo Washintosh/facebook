@@ -1,16 +1,16 @@
 import "./topbar.css";
 import { Search, Person, Chat, Notifications } from "@material-ui/icons";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
 import { IoLogOutOutline } from "react-icons/io5";
 import { FaBars } from "react-icons/fa";
+import { logout } from "../../redux/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { openClose } from "../../redux/sidebarSlice";
 
 export default function Topbar() {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const { user, dispatch, setIsSidebarOpen, isSidebarOpen } =
-    useContext(AuthContext);
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   return (
     <div className="topbarContainer">
       <div className="topbarLeft">
@@ -28,34 +28,27 @@ export default function Topbar() {
         </div>
       </div>
       <div className="topbarRight">
-        <div className="topbarIcons">
-          <div
-            className="faBars"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            <FaBars />
-            <span className="topbarIconBadge">1</span>
-          </div>
-          <div className="topbarIconItem">
-            <Person />
-            <span className="topbarIconBadge">1</span>
-          </div>
-          <div
-            className="topbarIconItem"
-            onClick={() => navigate("/messenger")}
-          >
-            <Chat />
-            <span className="topbarIconBadge">2</span>
-          </div>
-          <div className="topbarIconItem">
-            <Notifications />
-            <span className="topbarIconBadge">1</span>
-          </div>
+        <div className="faBars" onClick={() => dispatch(openClose())}>
+          <FaBars />
+          <span className="topbarIconBadge">1</span>
         </div>
-        <Link to={`/profile/${user?.username}`}>
-          <img src={user.profilePicture} alt="" className="topbarImg" />
+        <div className="topbarIconItem">
+          <Person />
+          <span className="topbarIconBadge">1</span>
+        </div>
+        <div className="topbarIconItem" onClick={() => navigate("/messenger")}>
+          <Chat />
+          <span className="topbarIconBadge">2</span>
+        </div>
+        <div className="topbarIconItem">
+          <Notifications />
+          <span className="topbarIconBadge">1</span>
+        </div>
+        <Link to={`/profile/${user?.username}`} className="topbarImg">
+          <img src={user.profilePicture} alt="" />
+          <p>{user.username}</p>
         </Link>
-        <button onClick={() => dispatch({ type: "LOGOUT" })} className="logout">
+        <button onClick={() => dispatch(logout())} className="logout">
           <IoLogOutOutline />
         </button>
       </div>

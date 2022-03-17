@@ -1,10 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import "./contact.css";
 
 export default function Contact({ user }) {
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
-
+  const navigate = useNavigate();
   return (
-    <li className="rightbarFriend">
+    <li className="rightbarFriend" onClick={() => navigate("/messenger")}>
       <div className="rightbarProfileImgContainer">
         <img className="rightbarProfileImg" src={user.profilePicture} alt="" />
         <span className="rightbarOnline"></span>

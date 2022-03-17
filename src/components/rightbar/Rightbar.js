@@ -1,44 +1,26 @@
 import "./rightbar.css";
 import Contact from "../contact/Contact";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
 import { Add, Remove } from "@material-ui/icons";
 import SuggestedFriends from "../suggestedFriends/SuggestedFriends";
+import { getFriends } from "../../apiCalls";
+import { useDispatch, useSelector } from "react-redux";
+import { follow, unfollow } from "../../redux/userSlice";
 
 export default function Rightbar({ user }) {
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [friends, setFriends] = useState([]);
-  const { user: currentUser, dispatch } = useContext(AuthContext);
   const [followed, setFollowed] = useState(false);
+  const { user: currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setFollowed(currentUser.followings.includes(user?._id));
   }, [user]);
 
   useEffect(() => {
-    const getFriends = async (user) => {
-      try {
-        const res = await axios.get(
-          "http://localhost:7000/api/users/friends/" + user._id,
-          {
-            headers: {
-              token: `Bearer ${
-                JSON.parse(localStorage.getItem("user")).accessToken
-              }`,
-            },
-          }
-        );
-        console.log(res.data.data);
-        setFriends(res.data.data);
-      } catch (err) {
-        console.log(err);
-        console.log(JSON.parse(err.request.response).message);
-      }
-    };
-
-    getFriends(currentUser);
+    getFriends(currentUser, setFriends);
   }, []);
 
   const handleClick = async () => {
@@ -57,7 +39,7 @@ export default function Rightbar({ user }) {
             },
           }
         );
-        dispatch({ type: "UNFOLLOW", payload: user._id });
+        dispatch(unfollow(user._id));
       } else {
         await axios.put(
           `http://localhost:7000/api/users/${user._id}/follow`,
@@ -72,7 +54,7 @@ export default function Rightbar({ user }) {
             },
           }
         );
-        dispatch({ type: "FOLLOW", payload: user._id });
+        dispatch(follow(user._id));
       }
       setFollowed(!followed);
     } catch (err) {}
@@ -137,11 +119,7 @@ export default function Rightbar({ user }) {
             >
               <div className="rightbarFollowing">
                 <img
-                  src={
-                    friend.profilePicture
-                      ? PF + friend.profilePicture
-                      : PF + "person/noAvatar.png"
-                  }
+                  src={friend.profilePicture}
                   alt=""
                   className="rightbarFollowingImg"
                 />

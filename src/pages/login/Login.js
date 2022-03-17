@@ -1,29 +1,32 @@
-import { useContext, useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import "./login.css";
-import { AuthContext } from "../../context/AuthContext";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { loginStart, loginSuccess, loginFailure } from "../../redux/userSlice";
 
 export default function Login() {
   const email = useRef();
   const password = useRef();
   const navigate = useNavigate();
-  const { isFetching, dispatch } = useContext(AuthContext);
+  // const { isFetching, dispatch } = useContext(AuthContext);
   const [error, setError] = useState({ message: "", show: false });
+  const { user, pending } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const handleClick = (e) => {
     e.preventDefault();
-    dispatch({ type: "LOGIN_START" });
+    dispatch(loginStart());
     const handleLogin = async () => {
       try {
         const res = await axios.post("http://localhost:7000/api/auth/login", {
           email: email.current.value,
           password: password.current.value,
         });
-        dispatch({ type: "LOGIN_SUCCESS", payload: res.data.data });
+        dispatch(loginSuccess(res.data.data));
       } catch (err) {
-        dispatch({ type: "LOGIN_FAILURE" });
+        dispatch(loginFailure());
         setError({
           message: JSON.parse(err.request.response).message,
           show: true,
@@ -32,7 +35,6 @@ export default function Login() {
     };
     handleLogin();
   };
-
   useEffect(() => {
     if (error.show) {
       const timeout = setTimeout(() => {
@@ -71,8 +73,8 @@ export default function Login() {
               className="loginInput"
               ref={password}
             />
-            <button className="loginButton" type="submit" disabled={isFetching}>
-              {isFetching ? (
+            <button className="loginButton" type="submit" disabled={pending}>
+              {pending ? (
                 <CircularProgress size="20px" sx={{ color: "white" }} />
               ) : (
                 "Log In"
@@ -83,7 +85,7 @@ export default function Login() {
               className="loginRegisterButton"
               onClick={() => navigate("/register")}
             >
-              {isFetching ? (
+              {pending ? (
                 <CircularProgress size="20px" sx={{ color: "white" }} />
               ) : (
                 "Create a New Account"

@@ -8,12 +8,17 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "./context/AuthContext";
+import { useEffect } from "react";
 import Messenger from "./pages/messenger/Messenger";
+import { useSelector } from "react-redux";
 
 function App() {
-  const { user } = useContext(AuthContext);
+  const { user } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    localStorage.setItem("user", JSON.stringify(user));
+  }, [user]);
+
   return (
     <Router>
       <Routes>

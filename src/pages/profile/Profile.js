@@ -3,19 +3,26 @@ import Topbar from "../../components/topbar/Topbar";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Feed from "../../components/feed/Feed";
 import Rightbar from "../../components/rightbar/Rightbar";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router";
-import { AuthContext } from "../../context/AuthContext";
 import storage from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { useDispatch, useSelector } from "react-redux";
+import CircularProgress from "@mui/material/CircularProgress";
+import {
+  updateStart,
+  updateSuccess,
+  updateFailure,
+} from "../../redux/userSlice";
 
 export default function Profile() {
-  const { user, dispatch } = useContext(AuthContext);
+  const { user, pending } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const { accessToken } = user;
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const { username } = useParams();
-  const [profilePic, setProfilePic] = useState(user.profilePicture);
+  const [profilePicture, setProfilePicture] = useState(user.profilePicture);
+  const [coverPicture, setCoverPicture] = useState(user.coverPicture);
   const [profileUser, setProfileUser] = useState({});
   const [alert, setAlert] = useState({
     show: false,
@@ -23,6 +30,8 @@ export default function Profile() {
     success: true,
   });
 
+  console.log("profilePicture", profilePicture);
+  console.log("coverPicture", coverPicture);
   useEffect(() => {
     const fetchUser = async () => {
       const res = await axios.get(
@@ -36,17 +45,13 @@ export default function Profile() {
         }
       );
       setProfileUser(res.data.data);
-      // dispatch({
-      //   type: "LOGIN_SUCCESS",
-      //   payload: res.data.data,
-      // });
     };
     fetchUser();
   }, [username]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    dispatch({ type: "UPDATE_START" });
+    dispatch(updateStart());
     const updateUser = async (body) => {
       try {
         const res = await axios.put(
@@ -64,10 +69,7 @@ export default function Profile() {
           password: {},
           ...updatedUser
         } = res.data.data;
-        dispatch({
-          type: "UPDATE_SUCCESS",
-          payload: { ...updatedUser, accessToken },
-        });
+        dispatch(updateSuccess({ ...updatedUser, accessToken }));
         setAlert({
           show: true,
           message: "The user was successfully updated",
@@ -80,16 +82,14 @@ export default function Profile() {
           message: JSON.parse(error.request.response).message,
           success: false,
         });
-        dispatch({
-          type: "UPDATE_FAILURE",
-        });
+        dispatch(updateFailure());
       }
     };
-    if (profilePic) {
-      const filename = new Date().getTime() + profilePic.name;
+    if (profilePicture) {
+      const filename = new Date().getTime() + profilePicture.name;
       const uploadTask = uploadBytesResumable(
         ref(storage, `/profile/${filename}`),
-        profilePic
+        profilePicture
       );
       uploadTask.on(
         "state_changed",
@@ -119,7 +119,6 @@ export default function Profile() {
       return () => clearTimeout(timeout);
     }
   }, [alert.show]);
-
   return (
     <>
       <Topbar />
@@ -153,18 +152,47 @@ export default function Profile() {
         <div className="profileRight">
           <div className="profileRightTop">
             <div className="profileCover">
+              {profileUser._id === user._id && (
+                <div className="coverImgContainer">
+                  <label htmlFor="file" className="changeCoverImg">
+                    <span className="shareOptionText">Change cover image</span>
+                    <input
+                      style={{ display: "none" }}
+                      type="file"
+                      id="file"
+                      accept=".png,.jpeg,.jpg"
+                      onChange={(e) => setCoverPicture(e.target.files[0])}
+                    />
+                  </label>
+                  {coverPicture !== user.coverPicture && (
+                    <button>
+                      {pending ? (
+                        <CircularProgress size="20px" sx={{ color: "white" }} />
+                      ) : (
+                        "UPDATE"
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
               <img
                 className="profileCoverImg"
-                src={profileUser.coverPicture}
+                src={
+                  user._id === profileUser._id
+                    ? coverPicture === user.coverPicture
+                      ? coverPicture
+                      : URL.createObjectURL(coverPicture)
+                    : profileUser.coverPicture
+                }
                 alt=""
               />
               <img
                 className="profileUserImg"
                 src={
-                  user === profileUser
-                    ? profilePic === user.profilePicture
-                      ? profilePic
-                      : URL.createObjectURL(profilePic)
+                  user._id === profileUser._id
+                    ? profilePicture === user.profilePicture
+                      ? profilePicture
+                      : URL.createObjectURL(profilePicture)
                     : profileUser.profilePicture
                 }
                 alt=""
@@ -185,11 +213,20 @@ export default function Profile() {
                         type="file"
                         id="file"
                         accept=".png,.jpeg,.jpg"
-                        onChange={(e) => setProfilePic(e.target.files[0])}
+                        onChange={(e) => setProfilePicture(e.target.files[0])}
                       />
                     </label>
-                    {profilePic !== user.profilePicture && (
-                      <button>UPDATE</button>
+                    {profilePicture !== user.profilePicture && (
+                      <button>
+                        {pending ? (
+                          <CircularProgress
+                            size="20px"
+                            sx={{ color: "white" }}
+                          />
+                        ) : (
+                          "UPDATE"
+                        )}
+                      </button>
                     )}
                   </>
                 )}

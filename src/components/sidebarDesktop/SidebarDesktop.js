@@ -13,14 +13,11 @@ import {
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { BsMessenger } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const { isSidebarOpen } = useContext(AuthContext);
   return (
-    <div className={`sidebarDesktop ${isSidebarOpen ? "show" : ""}`}>
+    <div className={`sidebarDesktop`}>
       <div className="sidebarWrapper">
         <ul className="sidebarList">
           <li className="sidebarListItem">

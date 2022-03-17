@@ -1,20 +1,20 @@
 import axios from "axios";
 
-export const loginCall = async (userCredential, dispatch) => {
-  dispatch({ type: "LOGIN_START" });
+export const getFriends = async (user, setFriends) => {
   try {
-    const res = await axios.post(
-      "http://localhost:7000/api/auth/login",
-      userCredential
+    const res = await axios.get(
+      `http://localhost:7000/api/users/friends/${user._id}`,
+      {
+        headers: {
+          token: `Bearer ${
+            JSON.parse(localStorage.getItem("user")).accessToken
+          }`,
+        },
+      }
     );
-    dispatch({ type: "LOGIN_SUCCESS", payload: res.data.data });
+    setFriends(res.data.data);
   } catch (err) {
-    dispatch({
-      type: "LOGIN_FAILURE",
-      payload: {
-        message: JSON.parse(err.request.response).message,
-        show: true,
-      },
-    });
+    console.log(err);
+    console.log(JSON.parse(err.request.response).message);
   }
 };

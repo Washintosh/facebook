@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 const SuggestedFriends = () => {
   const [suggestedFriends, setSuggestedFriends] = useState([]);
   const navigate = useNavigate();
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   useEffect(() => {
     const getSuggestedFriends = async () => {
       try {
@@ -30,6 +29,7 @@ const SuggestedFriends = () => {
   return (
     <div className="container">
       <h4>Suggested Friends</h4>
+      {suggestedFriends.length === 0 && <p>No friends suggestions</p>}
       {suggestedFriends.map((suggestion) => (
         <div
           className="suggestion"

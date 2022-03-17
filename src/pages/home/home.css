@@ -1,4 +1,23 @@
 .homeContainer {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
   width: 100%;
+  margin-top: 3rem;
+}
+
+@media screen and (max-width: 1100px) {
+  .homeContainer {
+    grid-template-columns: 3fr 1fr;
+  }
+  .leftSpace {
+    display: none;
+  }
+}
+@media screen and (max-width: 900px) {
+  .homeContainer {
+    grid-template-columns: 1fr;
+  }
+  .rightSpace {
+    display: none;
+  }
 }

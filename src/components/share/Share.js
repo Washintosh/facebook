@@ -6,15 +6,14 @@ import {
   EmojiEmotions,
   Cancel,
 } from "@material-ui/icons";
-import { useContext, useRef, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import { useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import storage from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 export default function Share() {
-  const { user } = useContext(AuthContext);
-  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const { user } = useSelector((state) => state.user);
   const desc = useRef();
   const [file, setFile] = useState(null);
 

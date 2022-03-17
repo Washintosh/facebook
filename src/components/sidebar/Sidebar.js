@@ -13,14 +13,23 @@ import {
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { BsMessenger } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
+import { getFriends } from "../../apiCalls";
+import Contact from "../contact/Contact";
+import { useSelector } from "react-redux";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const { isSidebarOpen } = useContext(AuthContext);
+  const [friends, setFriends] = useState([]);
+  const { user } = useSelector((state) => state.user);
+  const { sidebar } = useSelector((state) => state.sidebar);
+
+  useEffect(() => {
+    getFriends(user, setFriends);
+  }, []);
+
   return (
-    <div className={`sidebar ${isSidebarOpen ? "show" : ""}`}>
+    <div className={`sidebar ${sidebar ? "show" : ""}`}>
       <div className="sidebarWrapper">
         <ul className="sidebarList">
           <li className="sidebarListItem">
@@ -62,10 +71,12 @@ export default function Sidebar() {
             <School className="sidebarIcon" />
             <span className="sidebarListItemText">Courses</span>
           </li>
-          <li className="sidebarListItem">
-            <IoIosArrowDropdownCircle className="sidebarIcon more" />
-            <span className="sidebarListItemText">Show More</span>
-          </li>
+          <h4 className="rightbarTitle">Contacts</h4>
+          <ul className="rightbarFriendList">
+            {friends.map((u) => (
+              <Contact key={u._id} user={u} />
+            ))}
+          </ul>
         </ul>
       </div>
     </div>
