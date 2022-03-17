@@ -17,8 +17,38 @@ export const postsSlice = createSlice({
     fetchFailure: (state) => {
       state.pending = false;
     },
+    createPostStart: (state) => {
+      state.pending = true;
+    },
+    createPostSuccess: (state, action) => {
+      state.posts = [action.payload, ...state.posts];
+      state.pending = false;
+    },
+    createPostFailure: (state) => {
+      state.pending = false;
+    },
+    deletePostStart: (state) => {
+      state.pending = true;
+    },
+    deletePostSuccess: (state, action) => {
+      state.posts = state.posts.filter((p) => p._id !== action.payload);
+      state.pending = false;
+    },
+    deletePostFailure: (state) => {
+      state.pending = false;
+    },
   },
 });
 
-export const { fetchStart, fetchSuccess, fetchFailure } = postsSlice.actions;
+export const {
+  fetchStart,
+  fetchSuccess,
+  fetchFailure,
+  createPostStart,
+  createPostSuccess,
+  createPostFailure,
+  deletePostStart,
+  deletePostSuccess,
+  deletePostFailure,
+} = postsSlice.actions;
 export default postsSlice.reducer;

@@ -6,11 +6,38 @@ import { FaBars } from "react-icons/fa";
 import { logout } from "../../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { openClose } from "../../redux/sidebarSlice";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function Topbar() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    const fetchPeople = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:7000/api/users/search?username=${search}`,
+          {
+            headers: {
+              token: `Bearer ${
+                JSON.parse(localStorage.getItem("user")).accessToken
+              }`,
+            },
+          }
+        );
+        setResults(res.data.data);
+      } catch (err) {
+        console.log(err);
+        console.log(JSON.parse(err.request.response).message);
+        setResults([]);
+      }
+    };
+    fetchPeople();
+  }, [search]);
   return (
     <div className="topbarContainer">
       <div className="topbarLeft">
@@ -24,9 +51,31 @@ export default function Topbar() {
           <input
             placeholder="Search for friend, post or video"
             className="searchInput"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
           />
         </div>
       </div>
+      {search && (
+        <div className="searchResults">
+          {results.length !== 0 ? (
+            results.map((result) => (
+              <div
+                key={result._id}
+                className="result"
+                onClick={() => navigate(`/profile/${result.username}`)}
+              >
+                <img src={result.profilePicture} alt="search" />
+                <p>{result.username}</p>
+              </div>
+            ))
+          ) : (
+            <div className="noResults">No matches found</div>
+          )}
+        </div>
+      )}
       <div className="topbarRight">
         <div className="faBars" onClick={() => dispatch(openClose())}>
           <FaBars />

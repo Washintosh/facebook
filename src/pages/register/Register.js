@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./register.css";
 import { useNavigate } from "react-router";
 import CircularProgress from "@mui/material/CircularProgress";

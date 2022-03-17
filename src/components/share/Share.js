@@ -7,17 +7,27 @@ import {
   Cancel,
 } from "@material-ui/icons";
 import { useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import storage from "../../firebase";
+import CircularProgress from "@mui/material/CircularProgress";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  createPostStart,
+  createPostSuccess,
+  createPostFailure,
+} from "../../redux/postsSlice";
+import { showAlert } from "../../redux/alertSlice";
 
 export default function Share() {
   const { user } = useSelector((state) => state.user);
+  const { pending } = useSelector((state) => state.posts);
+  const dispatch = useDispatch();
   const desc = useRef();
   const [file, setFile] = useState(null);
 
   const submitHandler = async (e) => {
+    dispatch(createPostStart());
     e.preventDefault();
     const newPost = {
       userId: user._id,
@@ -41,16 +51,32 @@ export default function Share() {
         },
         async () => {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
+          newPost.imgName = filename;
           newPost.img = url;
           try {
-            await axios.post("http://localhost:7000/api/posts", newPost, {
-              headers: {
-                token: `Bearer ${
-                  JSON.parse(localStorage.getItem("user")).accessToken
-                }`,
-              },
-            });
+            const res = await axios.post(
+              "http://localhost:7000/api/posts",
+              newPost,
+              {
+                headers: {
+                  token: `Bearer ${
+                    JSON.parse(localStorage.getItem("user")).accessToken
+                  }`,
+                },
+              }
+            );
+            dispatch(createPostSuccess(res.data.data));
+            dispatch(
+              showAlert({ message: "Post successfully created", error: false })
+            );
           } catch (err) {
+            dispatch(createPostFailure());
+            dispatch(
+              showAlert({
+                message: JSON.parse(err.request.response).message,
+                error: true,
+              })
+            );
             console.log("err", err);
             console.log(JSON.parse(err.request.response).message);
           }
@@ -106,7 +132,11 @@ export default function Share() {
             </div>
           </div>
           <button className="shareButton" type="submit">
-            Share
+            {pending ? (
+              <CircularProgress size="20px" sx={{ color: "white" }} />
+            ) : (
+              "Share"
+            )}
           </button>
         </form>
       </div>

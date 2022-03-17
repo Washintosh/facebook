@@ -1,8 +1,36 @@
 .homeContainer {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   width: 100%;
   margin-top: 3rem;
+}
+
+.alertContainer {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+}
+.alert {
+  border-radius: 1rem;
+  padding: 0.5rem;
+  user-select: none;
+  transform: translateY(250%);
+  transition: transform ease 0.5s;
+  margin: 1rem;
+  color: #fff;
+}
+.alert.success {
+  background-color: green;
+}
+.alert.error {
+  background-color: red;
+}
+.alert.show {
+  transform: translateY(0);
 }
 
 @media screen and (max-width: 1100px) {

@@ -7,6 +7,7 @@
   position: fixed;
   top: 0;
   z-index: 999;
+  justify-content: center;
 }
 .logout {
   color: white;
@@ -22,9 +23,8 @@
 }
 
 .topbarLeft {
-  flex: 3;
+  width: 30%;
 }
-
 .logo {
   font-size: 24px;
   margin-left: 20px;
@@ -34,7 +34,36 @@
 }
 
 .topbarCenter {
-  width: 30%;
+  width: 40%;
+}
+.searchResults {
+  position: absolute;
+  width: 40%;
+  top: 3rem;
+}
+.noResults {
+  padding: 0.5rem;
+  background-color: #eee;
+  font-weight: 500;
+}
+.result {
+  display: flex;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  padding: 0.5rem;
+  gap: 1rem;
+  font-weight: 500;
+  background-color: #eee;
+}
+.result:hover {
+  background-color: #ddd;
+}
+.result img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .searchbar {
@@ -65,7 +94,7 @@
   align-items: center;
   justify-content: space-evenly;
   color: white;
-  width: 40%;
+  width: 30%;
 }
 
 .topbarLink {

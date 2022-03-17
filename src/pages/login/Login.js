@@ -10,9 +10,8 @@ export default function Login() {
   const email = useRef();
   const password = useRef();
   const navigate = useNavigate();
-  // const { isFetching, dispatch } = useContext(AuthContext);
   const [error, setError] = useState({ message: "", show: false });
-  const { user, pending } = useSelector((state) => state.user);
+  const { pending } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const handleClick = (e) => {

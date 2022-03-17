@@ -30,8 +30,6 @@ export default function Profile() {
     success: true,
   });
 
-  console.log("profilePicture", profilePicture);
-  console.log("coverPicture", coverPicture);
   useEffect(() => {
     const fetchUser = async () => {
       const res = await axios.get(
@@ -150,7 +148,7 @@ export default function Profile() {
         </div>
         <Sidebar />
         <div className="profileRight">
-          <div className="profileRightTop">
+          {/* <div className="profileRightTop">
             <div className="profileCover">
               {profileUser._id === user._id && (
                 <div className="coverImgContainer">
@@ -232,7 +230,7 @@ export default function Profile() {
                 )}
               </form>
             </div>
-          </div>
+          </div> */}
           <div className="profileRightBottom">
             <Feed username={username} />
             <Rightbar user={profileUser} />

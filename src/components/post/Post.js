@@ -4,14 +4,27 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "timeago.js";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deletePostStart,
+  deletePostSuccess,
+  deletePostFailure,
+} from "../../redux/postsSlice";
+import CircularProgress from "@mui/material/CircularProgress";
+import { ref, deleteObject } from "firebase/storage";
+import storage from "../../firebase";
+import { showAlert } from "../../redux/alertSlice";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
 export default function Post({ post }) {
   const [like, setLike] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
   const [user, setUser] = useState({});
   const { user: currentUser } = useSelector((state) => state.user);
+  const { pending } = useSelector((state) => state.posts);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setIsLiked(post.likes.includes(currentUser._id));
@@ -35,17 +48,41 @@ export default function Post({ post }) {
   }, [post.userId]);
 
   const handleDelete = async (e) => {
+    dispatch(deletePostStart());
     try {
-      await axios.delete(`http://localhost:7000/api/posts/${post._id}`, {
-        headers: {
-          token: `Bearer ${
-            JSON.parse(localStorage.getItem("user")).accessToken
-          }`,
-        },
-      });
+      const res = await axios.delete(
+        `http://localhost:7000/api/posts/${post._id}`,
+        {
+          headers: {
+            token: `Bearer ${
+              JSON.parse(localStorage.getItem("user")).accessToken
+            }`,
+          },
+        }
+      );
+      const { imgName } = res.data.data;
+      const fileRef = ref(storage, `/posts/${imgName}`);
+      deleteObject(fileRef)
+        .then(() => {
+          dispatch(deletePostSuccess(post._id));
+          dispatch(
+            showAlert({ message: "Post successfully deleted", error: false })
+          );
+        })
+        .catch((err) => {
+          dispatch(deletePostFailure());
+          dispatch(showAlert({ message: err, error: true }));
+        });
     } catch (error) {
       console.log(error);
       console.log(JSON.parse(error.request.response).message);
+      dispatch(deletePostFailure());
+      dispatch(
+        showAlert({
+          message: JSON.parse(error.request.response).message,
+          error: true,
+        })
+      );
     }
   };
 
@@ -74,7 +111,18 @@ export default function Post({ post }) {
         {currentUser._id === post.userId && (
           <div className={`${isMenuOpen ? "show" : ""} menu`}>
             <button className="menuBtn" onClick={handleDelete}>
-              Delete post
+              {pending ? (
+                <CircularProgress sx={{ color: "white" }} />
+              ) : (
+                "Modify post"
+              )}
+            </button>
+            <button className="menuBtn" onClick={handleDelete}>
+              {pending ? (
+                <CircularProgress sx={{ color: "white" }} />
+              ) : (
+                "Delete post"
+              )}
             </button>
           </div>
         )}
@@ -103,19 +151,24 @@ export default function Post({ post }) {
         </div>
         <div className="postBottom">
           <div className="postBottomLeft">
-            <img
-              className="likeIcon"
-              src={`https://firebasestorage.googleapis.com/v0/b/facebook-dc21a.appspot.com/o/public%2Flike.png?alt=media&token=2bdaea58-f4e6-4476-b1f9-72ccda9ddc95`}
-              onClick={likeHandler}
-              alt=""
-            />
-            <img
-              className="likeIcon"
-              src={`https://firebasestorage.googleapis.com/v0/b/facebook-dc21a.appspot.com/o/public%2Fheart.png?alt=media&token=2fe5af6b-ba62-463f-b8d4-3a9bc6642bf2`}
-              onClick={likeHandler}
-              alt=""
-            />
-            <span className="postLikeCounter">{like} people like it</span>
+            <button onClick={likeHandler} className="heartIcon">
+              {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            </button>
+            <span className="postLikeCounter">
+              {isLiked
+                ? `You ${
+                    like - 1 === 0
+                      ? "like it"
+                      : like - 1 === 1
+                      ? "and 1 person like it"
+                      : `and ${like - 1} people like it `
+                  }`
+                : like === 0
+                ? ""
+                : like === 1
+                ? "1 person likes it"
+                : `${like} people like it`}
+            </span>
           </div>
           <div className="postBottomRight">
             <span className="postCommentText">{post.comment} comments</span>
