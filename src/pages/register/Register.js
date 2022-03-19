@@ -4,6 +4,7 @@ import "./register.css";
 import { useNavigate } from "react-router";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useDispatch, useSelector } from "react-redux";
+import { Helmet } from "react-helmet";
 
 export default function Register() {
   const username = useRef();
@@ -55,6 +56,9 @@ export default function Register() {
 
   return (
     <div className="login">
+      <Helmet>
+        <title>Register</title>
+      </Helmet>
       <div className={`errorMessage ${error.show ? "show" : ""}`}>
         {error.message}
       </div>

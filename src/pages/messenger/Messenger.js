@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
+import { Helmet } from "react-helmet";
 
 export default function Messenger() {
   const [conversations, setConversations] = useState([]);
@@ -131,6 +132,9 @@ export default function Messenger() {
 
   return (
     <>
+      <Helmet>
+        <title>Messenger</title>
+      </Helmet>
       <Topbar />
       <div className="messenger">
         <div className="chatMenu">

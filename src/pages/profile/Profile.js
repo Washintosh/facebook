@@ -10,6 +10,7 @@ import storage from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
+import { Helmet } from "react-helmet";
 import {
   updateStart,
   updateSuccess,
@@ -119,6 +120,9 @@ export default function Profile() {
   }, [alert.show]);
   return (
     <>
+      <Helmet>
+        <title>{`${username} profile`}</title>
+      </Helmet>
       <Topbar />
       <div className="profile">
         <button

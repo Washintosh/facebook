@@ -16,13 +16,15 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getFriends } from "../../apiCalls";
 import Contact from "../contact/Contact";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { openClose } from "../../redux/sidebarSlice";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
   const { user } = useSelector((state) => state.user);
   const { sidebar } = useSelector((state) => state.sidebar);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     getFriends(user, setFriends);
@@ -38,7 +40,10 @@ export default function Sidebar() {
           </li>
           <li
             className="sidebarListItem"
-            onClick={() => navigate("/messenger")}
+            onClick={() => {
+              navigate("/messenger");
+              dispatch(openClose(false));
+            }}
           >
             <BsMessenger className="sidebarIcon" />
             <span className="sidebarListItemText">Messenger</span>

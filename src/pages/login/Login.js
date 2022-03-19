@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { loginStart, loginSuccess, loginFailure } from "../../redux/userSlice";
+import { Helmet } from "react-helmet";
 
 export default function Login() {
   const email = useRef();
@@ -44,55 +45,60 @@ export default function Login() {
   }, [error.show]);
 
   return (
-    <div className="login">
-      <div className={`errorMessage ${error.show ? "show" : ""}`}>
-        {error.message}
-      </div>
-      <div className="loginWrapper">
-        <div className="loginLeft">
-          <h3 className="loginLogo">facebook</h3>
-          <span className="loginDesc">
-            Connect with friends and the world around you on facebook.
-          </span>
+    <>
+      <Helmet>
+        <title>Login</title>
+      </Helmet>
+      <div className="login">
+        <div className={`errorMessage ${error.show ? "show" : ""}`}>
+          {error.message}
         </div>
-        <div className="loginRight">
-          <form className="loginBox" onSubmit={handleClick}>
-            <input
-              placeholder="Email"
-              type="email"
-              required
-              className="loginInput"
-              ref={email}
-            />
-            <input
-              placeholder="Password"
-              type="password"
-              required
-              minLength="6"
-              className="loginInput"
-              ref={password}
-            />
-            <button className="loginButton" type="submit" disabled={pending}>
-              {pending ? (
-                <CircularProgress size="20px" sx={{ color: "white" }} />
-              ) : (
-                "Log In"
-              )}
-            </button>
-            <span className="loginForgot">Forgot Password?</span>
-            <button
-              className="loginRegisterButton"
-              onClick={() => navigate("/register")}
-            >
-              {pending ? (
-                <CircularProgress size="20px" sx={{ color: "white" }} />
-              ) : (
-                "Create a New Account"
-              )}
-            </button>
-          </form>
+        <div className="loginWrapper">
+          <div className="loginLeft">
+            <h3 className="loginLogo">facebook</h3>
+            <span className="loginDesc">
+              Connect with friends and the world around you on facebook.
+            </span>
+          </div>
+          <div className="loginRight">
+            <form className="loginBox" onSubmit={handleClick}>
+              <input
+                placeholder="Email"
+                type="email"
+                required
+                className="loginInput"
+                ref={email}
+              />
+              <input
+                placeholder="Password"
+                type="password"
+                required
+                minLength="6"
+                className="loginInput"
+                ref={password}
+              />
+              <button className="loginButton" type="submit" disabled={pending}>
+                {pending ? (
+                  <CircularProgress size="20px" sx={{ color: "white" }} />
+                ) : (
+                  "Log In"
+                )}
+              </button>
+              <span className="loginForgot">Forgot Password?</span>
+              <button
+                className="loginRegisterButton"
+                onClick={() => navigate("/register")}
+              >
+                {pending ? (
+                  <CircularProgress size="20px" sx={{ color: "white" }} />
+                ) : (
+                  "Create a New Account"
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

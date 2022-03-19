@@ -12,6 +12,7 @@ import axios from "axios";
 export default function Topbar() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
+  const { sidebar } = useSelector((state) => state.sidebar);
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
@@ -65,7 +66,10 @@ export default function Topbar() {
               <div
                 key={result._id}
                 className="result"
-                onClick={() => navigate(`/profile/${result.username}`)}
+                onClick={() => {
+                  navigate(`/profile/${result.username}`);
+                  dispatch(openClose(false));
+                }}
               >
                 <img src={result.profilePicture} alt="search" />
                 <p>{result.username}</p>
@@ -77,7 +81,7 @@ export default function Topbar() {
         </div>
       )}
       <div className="topbarRight">
-        <div className="faBars" onClick={() => dispatch(openClose())}>
+        <div className="faBars" onClick={() => dispatch(openClose(!sidebar))}>
           <FaBars />
           <span className="topbarIconBadge">1</span>
         </div>
@@ -93,11 +97,23 @@ export default function Topbar() {
           <Notifications />
           <span className="topbarIconBadge">1</span>
         </div>
-        <Link to={`/profile/${user?.username}`} className="topbarImg">
+        <Link
+          to={`/profile/${user?.username}`}
+          className="topbarImg"
+          onClick={() => {
+            dispatch(openClose(false));
+          }}
+        >
           <img src={user.profilePicture} alt="" />
           <p>{user.username}</p>
         </Link>
-        <button onClick={() => dispatch(logout())} className="logout">
+        <button
+          onClick={() => {
+            dispatch(logout());
+            dispatch(openClose(false));
+          }}
+          className="logout"
+        >
           <IoLogOutOutline />
         </button>
       </div>

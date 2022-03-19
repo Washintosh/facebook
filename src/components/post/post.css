@@ -110,7 +110,57 @@
 }
 
 .postCommentText {
-  cursor: pointer;
-  border-bottom: 1px dashed gray;
   font-size: 15px;
+}
+
+.insertComment {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+.insertComment img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.insertComment textarea {
+  width: 100%;
+  border: none;
+  background-color: #ddd;
+  resize: none;
+  padding: 0.5rem;
+}
+
+.sendIcon {
+  display: flex;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  align-items: center;
+}
+.sendIcon:hover {
+  color: #1877f2;
+}
+.comment {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.comment img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.comment div {
+  border-radius: 1rem;
+  background-color: #ddd;
+  padding: 0.5rem;
+}
+.commentUsername {
+  font-weight: 500;
 }

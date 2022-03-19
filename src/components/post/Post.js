@@ -16,6 +16,7 @@ import storage from "../../firebase";
 import { showAlert } from "../../redux/alertSlice";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import SendIcon from "@mui/icons-material/Send";
 
 export default function Post({ post }) {
   const [like, setLike] = useState(post.likes.length);
@@ -105,18 +106,41 @@ export default function Post({ post }) {
     setLike(isLiked ? like - 1 : like + 1);
     setIsLiked(!isLiked);
   };
+
+  const [comment, setComment] = useState({
+    userId: currentUser._id,
+    username: currentUser.username,
+    userProfilePicture: currentUser.profilePicture,
+    text: "",
+    createdAt: new Date(),
+  });
+  const [comments, setComments] = useState(post.comments);
+  const handleComment = async () => {
+    try {
+      await axios.post(
+        `http://localhost:7000/api/posts/comment/${post._id}`,
+        comment,
+        {
+          headers: {
+            token: `Bearer ${
+              JSON.parse(localStorage.getItem("user")).accessToken
+            }`,
+          },
+        }
+      );
+      setComments([comment, ...comments]);
+      setComment({ ...comment, text: "" });
+    } catch (err) {
+      console.log(err);
+      console.log(JSON.parse(err.request.response).message);
+    }
+  };
+
   return (
     <div className="post">
       <div className="postWrapper">
         {currentUser._id === post.userId && (
           <div className={`${isMenuOpen ? "show" : ""} menu`}>
-            <button className="menuBtn" onClick={handleDelete}>
-              {pending ? (
-                <CircularProgress sx={{ color: "white" }} />
-              ) : (
-                "Modify post"
-              )}
-            </button>
             <button className="menuBtn" onClick={handleDelete}>
               {pending ? (
                 <CircularProgress sx={{ color: "white" }} />
@@ -171,8 +195,35 @@ export default function Post({ post }) {
             </span>
           </div>
           <div className="postBottomRight">
-            <span className="postCommentText">{post.comment} comments</span>
+            <span className="postCommentText">{comments.length} comments</span>
           </div>
+        </div>
+        <div className="insertComment">
+          <img src={currentUser.profilePicture} alt="" />
+          <textarea
+            name=""
+            id=""
+            placeholder="Add a comment"
+            rows={1}
+            onChange={(e) => {
+              setComment({ ...comment, text: e.target.value });
+            }}
+            value={comment.text}
+          ></textarea>
+          <button className="sendIcon" onClick={handleComment}>
+            <SendIcon />
+          </button>
+        </div>
+        <div className="comments">
+          {comments.map((comment, index) => (
+            <div className="comment" key={index}>
+              <img src={comment.userProfilePicture} alt="" />
+              <div>
+                <p className="commentUsername">{comment.username}</p>
+                <p className="commentText">{comment.text}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

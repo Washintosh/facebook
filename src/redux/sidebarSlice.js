@@ -6,8 +6,8 @@ export const sidebarSlice = createSlice({
     sidebar: false,
   },
   reducers: {
-    openClose: (state) => {
-      state.sidebar = !state.sidebar;
+    openClose: (state, action) => {
+      state.sidebar = action.payload;
     },
   },
 });

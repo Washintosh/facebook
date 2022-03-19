@@ -7,6 +7,7 @@ import "./home.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { hideAlert } from "../../redux/alertSlice";
+import { Helmet } from "react-helmet";
 
 export default function Home() {
   const { message, show, error } = useSelector((state) => state.alert);
@@ -24,6 +25,9 @@ export default function Home() {
 
   return (
     <>
+      <Helmet>
+        <title>Home</title>
+      </Helmet>
       <Topbar />
       <div className="homeContainer">
         <div className="alertContainer">
