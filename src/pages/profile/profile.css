@@ -4,6 +4,7 @@
   width: 100%;
   position: absolute;
   margin-top: 3rem;
+  padding: 1rem;
 }
 
 .test {
@@ -16,7 +17,11 @@
 }
 
 .profileRight {
-  flex: 9;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .profileCover {
@@ -76,7 +81,8 @@
 }
 
 .profileInfoName {
-  font-size: 24px;
+  font-size: 3rem;
+  padding: 1rem;
 }
 
 .profileInfoDesc {
@@ -135,4 +141,73 @@
 }
 .profile .alert.show {
   transform: translateX(0);
+}
+
+.followButton {
+  border: none;
+  background-color: #1872f2;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.followButton:hover {
+  background-color: #4484df;
+}
+
+.middleProfile {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.friendsContainer {
+  background-color: #6ea4f0;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+}
+.sectionTitle {
+  font-size: 2rem;
+  font-weight: 400;
+}
+.followingList {
+  display: flex;
+  padding: 0.5rem;
+}
+.following {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 1rem;
+  padding: 0.5rem;
+}
+.following:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.followingImg {
+  object-fit: cover;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+}
+
+.followingName {
+  font-weight: 500;
+  color: #000;
+}
+.postsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: black solid 2px;
+  border-radius: 2rem;
+  width: fit-content;
 }

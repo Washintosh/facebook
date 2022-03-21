@@ -208,6 +208,9 @@ export default function Post({ post }) {
             onChange={(e) => {
               setComment({ ...comment, text: e.target.value });
             }}
+            onKeyDown={(e) => {
+              e.key === "Enter" && handleComment();
+            }}
             value={comment.text}
           ></textarea>
           <button className="sendIcon" onClick={handleComment}>

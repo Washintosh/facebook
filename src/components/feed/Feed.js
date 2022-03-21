@@ -52,6 +52,7 @@ export default function Feed({ username }) {
   return (
     <div className="feed">
       <div className="feedWrapper">
+        {posts.length === 0 && <p className="noPosts">No posts to show</p>}
         {(!username || username === user.username) && <Share />}
         {pending && (
           <div className="skeleton">

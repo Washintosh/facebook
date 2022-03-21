@@ -14,21 +14,18 @@ import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { BsMessenger } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getFriends } from "../../apiCalls";
 import Contact from "../contact/Contact";
 import { useDispatch, useSelector } from "react-redux";
 import { openClose } from "../../redux/sidebarSlice";
+import useFriends from "../../hooks/useFriends";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const [friends, setFriends] = useState([]);
   const { user } = useSelector((state) => state.user);
   const { sidebar } = useSelector((state) => state.sidebar);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    getFriends(user, setFriends);
-  }, []);
+  const friends = useFriends(user);
 
   return (
     <div className={`sidebar ${sidebar ? "show" : ""}`}>

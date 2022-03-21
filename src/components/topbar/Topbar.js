@@ -69,6 +69,7 @@ export default function Topbar() {
                 onClick={() => {
                   navigate(`/profile/${result.username}`);
                   dispatch(openClose(false));
+                  setSearch("");
                 }}
               >
                 <img src={result.profilePicture} alt="search" />

@@ -1,0 +1,18 @@
+{
+  "short_name": "Facebook",
+  "name": "Facebook Clone",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#1775ee",
+  "background_color": "#ffffff",
+  "related_applications": [],
+  "prefer_related_applications": false
+}

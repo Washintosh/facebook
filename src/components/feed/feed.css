@@ -3,7 +3,9 @@
   display: flex;
   justify-content: center;
 }
-
+.noPosts {
+  text-align: center;
+}
 .feedWrapper {
   width: 40%;
   min-width: 500px;

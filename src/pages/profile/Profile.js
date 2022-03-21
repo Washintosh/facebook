@@ -2,20 +2,22 @@ import "./profile.css";
 import Topbar from "../../components/topbar/Topbar";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Feed from "../../components/feed/Feed";
-import Rightbar from "../../components/rightbar/Rightbar";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router";
+import { useParams, Link } from "react-router-dom";
 import storage from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useDispatch, useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import { Helmet } from "react-helmet";
+import { Add, Remove } from "@material-ui/icons";
+import { follow, unfollow } from "../../redux/userSlice";
 import {
   updateStart,
   updateSuccess,
   updateFailure,
 } from "../../redux/userSlice";
+import useFriends from "../../hooks/useFriends";
 
 export default function Profile() {
   const { user, pending } = useSelector((state) => state.user);
@@ -118,6 +120,60 @@ export default function Profile() {
       return () => clearTimeout(timeout);
     }
   }, [alert.show]);
+
+  // const ProfileRightbar = () => {
+  //   return (
+  //     <>
+  //       <h4 className="rightbarTitle">User information</h4>
+  //
+  //     </>
+  //   );
+  // };
+  const [followed, setFollowed] = useState(false);
+
+  const handleClick = async () => {
+    try {
+      if (followed) {
+        await axios.put(
+          `http://localhost:7000/api/users/${profileUser._id}/unfollow`,
+          {
+            userId: user._id,
+          },
+          {
+            headers: {
+              token: `Bearer ${
+                JSON.parse(localStorage.getItem("user")).accessToken
+              }`,
+            },
+          }
+        );
+        dispatch(unfollow(profileUser._id));
+      } else {
+        await axios.put(
+          `http://localhost:7000/api/users/${profileUser._id}/follow`,
+          {
+            userId: user._id,
+          },
+          {
+            headers: {
+              token: `Bearer ${
+                JSON.parse(localStorage.getItem("user")).accessToken
+              }`,
+            },
+          }
+        );
+        dispatch(follow(profileUser._id));
+      }
+      setFollowed(!followed);
+    } catch (err) {}
+  };
+
+  useEffect(() => {
+    setFollowed(user.followings.includes(profileUser?._id));
+  }, [profileUser]);
+
+  const friends = useFriends(profileUser);
+
   return (
     <>
       <Helmet>
@@ -125,18 +181,6 @@ export default function Profile() {
       </Helmet>
       <Topbar />
       <div className="profile">
-        <button
-          className="test"
-          onClick={() =>
-            setAlert({
-              show: true,
-              message: "The user was successfully updated",
-              success: true,
-            })
-          }
-        >
-          TEST
-        </button>
         <div
           className={`${
             alert.show
@@ -152,7 +196,7 @@ export default function Profile() {
         </div>
         <Sidebar />
         <div className="profileRight">
-          {/* <div className="profileRightTop">
+          <div className="profileRightTop">
             <div className="profileCover">
               {profileUser._id === user._id && (
                 <div className="coverImgContainer">
@@ -234,11 +278,40 @@ export default function Profile() {
                 )}
               </form>
             </div>
-          </div> */}
-          <div className="profileRightBottom">
-            <Feed username={username} />
-            <Rightbar user={profileUser} />
           </div>
+          <div className="middleProfile">
+            {profileUser.username !== user.username && (
+              <button className="followButton" onClick={handleClick}>
+                {followed ? "Unfollow" : "Follow"}
+                {followed ? <Remove /> : <Add />}
+              </button>
+            )}
+            <section className="friendsContainer">
+              <h4 className="sectionTitle">Friends</h4>
+              <div className="followingList">
+                {friends.map((friend) => (
+                  <Link
+                    key={friend._id}
+                    to={"/profile/" + friend.username}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div className="following">
+                      <img
+                        src={friend.profilePicture}
+                        alt=""
+                        className="followingImg"
+                      />
+                      <span className="followingName">{friend.username}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          </div>
+          <section className="postsContainer">
+            <h4 className="sectionTitle">Posts</h4>
+            <Feed username={username} />
+          </section>
         </div>
       </div>
     </>
