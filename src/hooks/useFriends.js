@@ -22,7 +22,7 @@ const useFriends = (user) => {
         console.log(JSON.parse(err.request.response).message);
       }
     };
-    getFriends();
+    user._id && getFriends();
   }, [user]);
   return friends;
 };

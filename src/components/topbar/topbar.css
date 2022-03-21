@@ -7,7 +7,7 @@
   position: fixed;
   top: 0;
   z-index: 999;
-  justify-content: center;
+  justify-content: space-between;
 }
 .logout {
   color: white;
@@ -23,14 +23,22 @@
 }
 
 .topbarLeft {
-  width: 30%;
+  display: flex;
+  justify-content: center;
+  width: 3rem;
 }
 .logo {
   font-size: 24px;
-  margin-left: 20px;
   font-weight: bold;
   color: white;
   cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  padding: 0 0.75rem;
+  text-align: center;
+}
+.logo:hover {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .topbarCenter {
@@ -92,9 +100,8 @@
 .topbarRight {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
   color: white;
-  width: 30%;
+  gap: 1rem;
 }
 
 .topbarLink {

@@ -24,15 +24,18 @@ export default function Profile() {
   const dispatch = useDispatch();
   const { accessToken } = user;
   const { username } = useParams();
-  const [profilePicture, setProfilePicture] = useState(user.profilePicture);
-  const [coverPicture, setCoverPicture] = useState(user.coverPicture);
-  const [profileUser, setProfileUser] = useState({});
+  const [profileUser, setProfileUser] = useState({
+    coverPicture: "",
+    profilePicture: "",
+  });
+  const [profilePicture, setProfilePicture] = useState("");
+  const [coverPicture, setCoverPicture] = useState("");
   const [alert, setAlert] = useState({
     show: false,
     message: "",
     success: true,
   });
-
+  const [upload, setUpload] = useState({});
   useEffect(() => {
     const fetchUser = async () => {
       const res = await axios.get(
@@ -46,6 +49,8 @@ export default function Profile() {
         }
       );
       setProfileUser(res.data.data);
+      setProfilePicture(res.data.data.profilePicture);
+      setCoverPicture(res.data.data.coverPicture);
     };
     fetchUser();
   }, [username]);
@@ -86,28 +91,35 @@ export default function Profile() {
         dispatch(updateFailure());
       }
     };
-    if (profilePicture) {
-      const filename = new Date().getTime() + profilePicture.name;
+    console.log(e.target);
+    if (upload.file) {
+      const filename = new Date().getTime() + upload.file.name;
       const uploadTask = uploadBytesResumable(
         ref(storage, `/profile/${filename}`),
-        profilePicture
+        upload.file
       );
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            updateUser({ profilePicture: url });
-          });
-        }
-      );
+      try {
+        const url = await new Promise((res, rej) => {
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log("Upload is " + progress + "% done");
+            },
+            (error) => {
+              rej(error);
+            },
+            async () => {
+              res(await getDownloadURL(uploadTask.snapshot.ref));
+            }
+          );
+        });
+        await updateUser({ [upload.name]: url });
+        setUpload({});
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -121,16 +133,7 @@ export default function Profile() {
     }
   }, [alert.show]);
 
-  // const ProfileRightbar = () => {
-  //   return (
-  //     <>
-  //       <h4 className="rightbarTitle">User information</h4>
-  //
-  //     </>
-  //   );
-  // };
   const [followed, setFollowed] = useState(false);
-
   const handleClick = async () => {
     try {
       if (followed) {
@@ -167,13 +170,13 @@ export default function Profile() {
       setFollowed(!followed);
     } catch (err) {}
   };
-
+  console.log("user", user);
+  console.log("profileUser", profileUser);
   useEffect(() => {
     setFollowed(user.followings.includes(profileUser?._id));
   }, [profileUser]);
 
   const friends = useFriends(profileUser);
-
   return (
     <>
       <Helmet>
@@ -198,19 +201,38 @@ export default function Profile() {
         <div className="profileRight">
           <div className="profileRightTop">
             <div className="profileCover">
+              <img
+                className="profileCoverImg"
+                src={
+                  coverPicture &&
+                  (user._id === profileUser._id
+                    ? coverPicture === profileUser.coverPicture
+                      ? coverPicture
+                      : URL.createObjectURL(coverPicture)
+                    : profileUser.coverPicture)
+                }
+                alt=""
+              />
               {profileUser._id === user._id && (
-                <div className="coverImgContainer">
-                  <label htmlFor="file" className="changeCoverImg">
+                <form className="coverImgContainer" onSubmit={submitHandler}>
+                  <label htmlFor="coverImg" className="changeCoverImg">
                     <span className="shareOptionText">Change cover image</span>
                     <input
                       style={{ display: "none" }}
                       type="file"
-                      id="file"
+                      id="coverImg"
+                      name="coverPicture"
                       accept=".png,.jpeg,.jpg"
-                      onChange={(e) => setCoverPicture(e.target.files[0])}
+                      onChange={(e) => {
+                        setUpload({
+                          name: e.target.name,
+                          file: e.target.files[0],
+                        });
+                        setCoverPicture(e.target.files[0]);
+                      }}
                     />
                   </label>
-                  {coverPicture !== user.coverPicture && (
+                  {upload.name === "coverPicture" && (
                     <button>
                       {pending ? (
                         <CircularProgress size="20px" sx={{ color: "white" }} />
@@ -219,27 +241,17 @@ export default function Profile() {
                       )}
                     </button>
                   )}
-                </div>
+                </form>
               )}
-              <img
-                className="profileCoverImg"
-                src={
-                  user._id === profileUser._id
-                    ? coverPicture === user.coverPicture
-                      ? coverPicture
-                      : URL.createObjectURL(coverPicture)
-                    : profileUser.coverPicture
-                }
-                alt=""
-              />
               <img
                 className="profileUserImg"
                 src={
-                  user._id === profileUser._id
-                    ? profilePicture === user.profilePicture
+                  profilePicture &&
+                  (user._id === profileUser._id
+                    ? profilePicture === profileUser.profilePicture
                       ? profilePicture
                       : URL.createObjectURL(profilePicture)
-                    : profileUser.profilePicture
+                    : profileUser.profilePicture)
                 }
                 alt=""
               />
@@ -250,19 +262,26 @@ export default function Profile() {
               <form onSubmit={submitHandler} className="changeImgForm">
                 {profileUser._id === user._id && (
                   <>
-                    <label htmlFor="file" className="changeImg">
+                    <label htmlFor="profileImg" className="changeImg">
                       <span className="shareOptionText">
                         Change profile image
                       </span>
                       <input
                         style={{ display: "none" }}
                         type="file"
-                        id="file"
+                        id="profileImg"
+                        name="profilePicture"
                         accept=".png,.jpeg,.jpg"
-                        onChange={(e) => setProfilePicture(e.target.files[0])}
+                        onChange={(e) => {
+                          setUpload({
+                            name: e.target.name,
+                            file: e.target.files[0],
+                          });
+                          setProfilePicture(e.target.files[0]);
+                        }}
                       />
                     </label>
-                    {profilePicture !== user.profilePicture && (
+                    {upload.name === "profilePicture" && (
                       <button>
                         {pending ? (
                           <CircularProgress

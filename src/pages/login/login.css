@@ -12,7 +12,7 @@
   width: 70%;
   height: 70%;
   display: flex;
-  gap: 1rem;
+  gap: 3rem;
 }
 
 .loginLeft,
@@ -26,7 +26,8 @@
 }
 
 .loginLogo {
-  font-size: 2rem;
+  font-size: 4rem;
+  font-weight: 700;
   color: #1775ee;
   margin-bottom: 10px;
 }
@@ -36,6 +37,7 @@
 }
 
 .loginBox {
+  max-width: 400px;
   padding: 20px;
   background-color: white;
   border-radius: 10px;
@@ -43,9 +45,11 @@
   flex-direction: column;
   width: 100%;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%), 0 8px 16px rgb(0 0 0 / 10%);
+  gap: 1rem;
 }
 
 .loginInput {
+  padding: 1rem 0;
   border-radius: 10px;
   border: 1px solid gray;
   font-size: 18px;
@@ -58,6 +62,7 @@
 }
 
 .loginButton {
+  font-size: 20px;
   padding: 0.75rem 0;
   border-radius: 10px;
   border: none;

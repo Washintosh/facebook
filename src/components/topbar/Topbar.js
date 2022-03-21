@@ -43,7 +43,8 @@ export default function Topbar() {
     <div className="topbarContainer">
       <div className="topbarLeft">
         <Link to="/" style={{ textDecoration: "none" }}>
-          <span className="logo">facebook</span>
+          <span className="logo">f</span>
+          {/* <img src="../../../favicon.png" alt="icon" /> */}
         </Link>
       </div>
       <div className="topbarCenter">

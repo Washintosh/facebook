@@ -1,15 +1,11 @@
 import "./rightbar.css";
 import Contact from "../contact/Contact";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
 import SuggestedFriends from "../suggestedFriends/SuggestedFriends";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import useFriends from "../../hooks/useFriends";
 
 export default function Rightbar() {
   const { user } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const friends = useFriends(user);
 
   return (
