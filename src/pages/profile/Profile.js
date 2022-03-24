@@ -37,6 +37,9 @@ export default function Profile() {
   });
   const [upload, setUpload] = useState({});
   useEffect(() => {
+    setUpload({});
+    setProfilePicture("");
+    setCoverPicture("");
     const fetchUser = async () => {
       const res = await axios.get(
         `http://localhost:7000/api/users?username=${username}`,
@@ -49,11 +52,9 @@ export default function Profile() {
         }
       );
       setProfileUser(res.data.data);
-      setProfilePicture(res.data.data.profilePicture);
-      setCoverPicture(res.data.data.coverPicture);
     };
     fetchUser();
-  }, [username]);
+  }, [username, user]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -91,7 +92,6 @@ export default function Profile() {
         dispatch(updateFailure());
       }
     };
-    console.log(e.target);
     if (upload.file) {
       const filename = new Date().getTime() + upload.file.name;
       const uploadTask = uploadBytesResumable(
@@ -117,6 +117,8 @@ export default function Profile() {
         });
         await updateUser({ [upload.name]: url });
         setUpload({});
+        setCoverPicture("");
+        setProfilePicture("");
       } catch (error) {
         console.log(error);
       }
@@ -170,8 +172,6 @@ export default function Profile() {
       setFollowed(!followed);
     } catch (err) {}
   };
-  console.log("user", user);
-  console.log("profileUser", profileUser);
   useEffect(() => {
     setFollowed(user.followings.includes(profileUser?._id));
   }, [profileUser]);
@@ -204,11 +204,9 @@ export default function Profile() {
               <img
                 className="profileCoverImg"
                 src={
-                  coverPicture &&
-                  (user._id === profileUser._id
-                    ? coverPicture === profileUser.coverPicture
-                      ? coverPicture
-                      : URL.createObjectURL(coverPicture)
+                  profileUser &&
+                  (coverPicture
+                    ? URL.createObjectURL(coverPicture)
                     : profileUser.coverPicture)
                 }
                 alt=""
@@ -246,11 +244,9 @@ export default function Profile() {
               <img
                 className="profileUserImg"
                 src={
-                  profilePicture &&
-                  (user._id === profileUser._id
-                    ? profilePicture === profileUser.profilePicture
-                      ? profilePicture
-                      : URL.createObjectURL(profilePicture)
+                  profileUser &&
+                  (profilePicture
+                    ? URL.createObjectURL(profilePicture)
                     : profileUser.profilePicture)
                 }
                 alt=""

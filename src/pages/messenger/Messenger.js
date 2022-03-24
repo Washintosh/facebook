@@ -90,7 +90,6 @@ export default function Messenger() {
   }, [currentChat]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
     const message = {
       sender: user._id,
       text: newMessage,
@@ -168,6 +167,9 @@ export default function Messenger() {
                     placeholder="write something..."
                     onChange={(e) => setNewMessage(e.target.value)}
                     value={newMessage}
+                    onKeyDown={(e) => {
+                      e.key === "Enter" && handleSubmit();
+                    }}
                   ></textarea>
                   <button className="chatSubmitButton" onClick={handleSubmit}>
                     Send
