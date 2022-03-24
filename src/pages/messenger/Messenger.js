@@ -8,6 +8,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
 import { Helmet } from "react-helmet";
+import Sidebar from "../../components/sidebar/Sidebar";
 
 export default function Messenger() {
   const [conversations, setConversations] = useState([]);
@@ -70,7 +71,7 @@ export default function Messenger() {
     const getMessages = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:7000/api/messages/" + currentChat?._id,
+          "http://localhost:7000/api/messages/" + currentChat._id,
           {
             headers: {
               token: `Bearer ${
@@ -82,6 +83,7 @@ export default function Messenger() {
         setMessages(res.data.data);
       } catch (err) {
         console.log(JSON.parse(err.request.response).message);
+        setMessages([]);
       }
     };
     if (currentChat) {
@@ -135,17 +137,23 @@ export default function Messenger() {
         <title>Messenger</title>
       </Helmet>
       <Topbar />
+      <Sidebar />
       <div className="messenger">
         <div className="chatMenu">
           <div className="chatMenuWrapper">
-            <input placeholder="Search for friends" className="chatMenuInput" />
             {conversations.map((c) => (
               <div
-                onClick={() => setCurrentChat(c)}
+                onClick={() => {
+                  setCurrentChat(c);
+                }}
                 key={c._id}
                 className={`${c._id === currentChat?._id ? "current" : ""}`}
               >
-                <Conversation conversation={c} currentUser={user} />
+                <Conversation
+                  conversation={c}
+                  currentUser={user}
+                  selected={c._id === currentChat?._id}
+                />
               </div>
             ))}
           </div>
@@ -155,6 +163,7 @@ export default function Messenger() {
             {currentChat ? (
               <>
                 <div className="chatBoxTop">
+                  {messages.length === 0 && "No messages were found"}
                   {messages.map((m) => (
                     <div ref={scrollRef} key={m._id}>
                       <Message message={m} own={m.sender === user._id} />

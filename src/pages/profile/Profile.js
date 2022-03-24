@@ -167,6 +167,20 @@ export default function Profile() {
             },
           }
         );
+        await axios.post(
+          `http://localhost:7000/api/conversations/`,
+          {
+            senderId: user._id,
+            receiverId: profileUser._id,
+          },
+          {
+            headers: {
+              token: `Bearer ${
+                JSON.parse(localStorage.getItem("user")).accessToken
+              }`,
+            },
+          }
+        );
         dispatch(follow(profileUser._id));
       }
       setFollowed(!followed);

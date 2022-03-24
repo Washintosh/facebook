@@ -42,9 +42,14 @@ export default function Topbar() {
   return (
     <div className="topbarContainer">
       <div className="topbarLeft">
-        <Link to="/" style={{ textDecoration: "none" }}>
+        <Link
+          to="/"
+          style={{ textDecoration: "none" }}
+          onClick={() => {
+            dispatch(openClose(false));
+          }}
+        >
           <span className="logo">f</span>
-          {/* <img src="../../../favicon.png" alt="icon" /> */}
         </Link>
       </div>
       <div className="topbarCenter">
