@@ -4,6 +4,7 @@ import postsReducer from "./postsSlice";
 import sidebarReducer from "./sidebarSlice";
 import alertReducer from "./alertSlice";
 import chatReducer from "./chatSlice";
+import darkReducer from "./darkSlice";
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   sidebar: sidebarReducer,
   alert: alertReducer,
   chat: chatReducer,
+  dark: darkReducer,
 });
 
 export default configureStore({

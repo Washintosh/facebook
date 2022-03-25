@@ -18,11 +18,15 @@ import Contact from "../contact/Contact";
 import { useDispatch, useSelector } from "react-redux";
 import { openClose } from "../../redux/sidebarSlice";
 import useFriends from "../../hooks/useFriends";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import { setDark } from "../../redux/darkSlice";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
   const { sidebar } = useSelector((state) => state.sidebar);
+  const { value: dark } = useSelector((state) => state.dark);
   const dispatch = useDispatch();
 
   const friends = useFriends(user);
@@ -72,6 +76,19 @@ export default function Sidebar() {
           <li className="sidebarListItem">
             <School className="sidebarIcon" />
             <span className="sidebarListItemText">Courses</span>
+          </li>
+          <li
+            className="sidebarListItem"
+            onClick={() => {
+              dispatch(setDark(!dark));
+            }}
+          >
+            <div className="sidebarIcon">
+              {dark ? <DarkModeIcon /> : <DarkModeOutlinedIcon />}
+            </div>
+            <span className="sidebarListItemText">
+              {dark ? "Dark theme" : "Light theme"}
+            </span>
           </li>
           <h4 className="rightbarTitle">Contacts</h4>
           <ul className="rightbarFriendList">

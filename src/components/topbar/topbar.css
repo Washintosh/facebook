@@ -6,8 +6,9 @@
   align-items: center;
   position: fixed;
   top: 0;
-  z-index: 999;
+  z-index: 20;
   justify-content: space-between;
+  gap: 1rem;
 }
 .logout {
   color: white;
@@ -24,8 +25,8 @@
 
 .topbarLeft {
   display: flex;
-  justify-content: center;
-  width: 3rem;
+  padding: 1rem;
+  width: 30%;
 }
 .logo {
   font-size: 24px;
@@ -44,10 +45,16 @@
 .topbarCenter {
   width: 40%;
 }
-.searchResults {
+.searchResultsContainer {
   position: absolute;
-  width: 40%;
   top: 3rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.searchResults {
+  min-width: 400px;
+  width: 40%;
 }
 .noResults {
   padding: 0.5rem;
@@ -100,8 +107,11 @@
 .topbarRight {
   display: flex;
   align-items: center;
+  justify-content: center;
   color: white;
   gap: 1rem;
+  width: 30%;
+  min-width: fit-content;
 }
 
 .topbarLink {
@@ -117,6 +127,7 @@
 .topbarIconItem {
   cursor: pointer;
   position: relative;
+  color: #fff;
 }
 
 .topbarIconBadge {
@@ -166,5 +177,11 @@
 @media screen and (max-width: 768px) {
   .topbarLink {
     display: none;
+  }
+  .topbarCenter {
+    width: 100%;
+  }
+  .topbarLeft {
+    width: fit-content;
   }
 }

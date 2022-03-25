@@ -8,10 +8,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { openClose } from "../../redux/sidebarSlice";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import { setDark } from "../../redux/darkSlice";
 
 export default function Topbar() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
+  const { value: dark } = useSelector((state) => state.dark);
   const { sidebar } = useSelector((state) => state.sidebar);
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -66,25 +70,27 @@ export default function Topbar() {
         </div>
       </div>
       {search && (
-        <div className="searchResults">
-          {results.length !== 0 ? (
-            results.map((result) => (
-              <div
-                key={result._id}
-                className="result"
-                onClick={() => {
-                  navigate(`/profile/${result.username}`);
-                  dispatch(openClose(false));
-                  setSearch("");
-                }}
-              >
-                <img src={result.profilePicture} alt="search" />
-                <p>{result.username}</p>
-              </div>
-            ))
-          ) : (
-            <div className="noResults">No matches found</div>
-          )}
+        <div className="searchResultsContainer">
+          <div className="searchResults">
+            {results.length !== 0 ? (
+              results.map((result) => (
+                <div
+                  key={result._id}
+                  className="result"
+                  onClick={() => {
+                    navigate(`/profile/${result.username}`);
+                    dispatch(openClose(false));
+                    setSearch("");
+                  }}
+                >
+                  <img src={result.profilePicture} alt="search" />
+                  <p>{result.username}</p>
+                </div>
+              ))
+            ) : (
+              <div className="noResults">No matches found</div>
+            )}
+          </div>
         </div>
       )}
       <div className="topbarRight">
@@ -103,6 +109,14 @@ export default function Topbar() {
         <div className="topbarIconItem">
           <Notifications />
           <span className="topbarIconBadge">1</span>
+        </div>
+        <div
+          className="topbarIconItem"
+          onClick={() => {
+            dispatch(setDark(!dark));
+          }}
+        >
+          {dark ? <DarkModeIcon /> : <DarkModeOutlinedIcon />}
         </div>
         <Link
           to={`/profile/${user?.username}`}
